@@ -1,16 +1,16 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -g
 
-# O comando 'make' ou 'make all' agora compila os dois executáveis: bv e corretora
+COMUM = src/common/logs.c src/common/util.c
+COMUM_H = src/common/logs.h src/common/util.h
+
 all: bv corretora
 
-# Compila o Servidor (Bolsa de Valores)
-bv: src/bv/main.c src/bv/empresas.c src/bv/empresas.h src/bv/logs.c src/bv/logs.h
-	$(CC) $(CFLAGS) -o bv src/bv/main.c src/bv/empresas.c src/bv/logs.c
+bv: src/bv/main.c src/bv/empresas.c src/bv/config.c src/bv/empresas.h src/bv/config.h $(COMUM) $(COMUM_H)
+	$(CC) $(CFLAGS) -o bv src/bv/main.c src/bv/empresas.c src/bv/config.c $(COMUM)
 
-# Compila o Cliente (Corretora)
-corretora: src/corretora/main.c src/bv/logs.c src/bv/logs.h
-	$(CC) $(CFLAGS) -o corretora src/corretora/main.c src/bv/logs.c
+corretora: src/corretora/main.c src/corretora/config.c src/corretora/config.h $(COMUM) $(COMUM_H)
+	$(CC) $(CFLAGS) -o corretora src/corretora/main.c src/corretora/config.c $(COMUM)
 
 clean:
 	rm -f bv corretora *.log *.tmp
