@@ -26,4 +26,7 @@ int  empresas_carregar(const char *ficheiro, TabelaEmpresas *t);
 void empresas_imprimir(const TabelaEmpresas *t);
 int  empresas_guardar(const char *ficheiro, const TabelaEmpresas *t);
 
+// Devolve 1 se a empresa existe na tabela, 0 se não existir
+int empresas_existe(const TabelaEmpresas *t, const char *nome);
+
 #endif

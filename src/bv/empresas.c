@@ -4,7 +4,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h> // Se ainda não tiver este include no topo do ficheiro
 #include "empresas.h"
+
 
 void tabela_iniciar(TabelaEmpresas *t)
 {
@@ -100,4 +102,16 @@ int empresas_guardar(const char *ficheiro, const TabelaEmpresas *t)
         return -1;
     }
     return 0;
+}
+
+int empresas_existe(const TabelaEmpresas *t, const char *nome)
+{
+    if (t == NULL || nome == NULL) return 0;
+
+    for (int i = 0; i < t->n; i++) {
+        if (strcmp(t->dados[i].nome, nome) == 0) {
+            return 1; // Encontrou!
+        }
+    }
+    return 0; // Não existe
 }
