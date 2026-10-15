@@ -46,9 +46,10 @@ int empresas_carregar(const char *ficheiro, TabelaEmpresas *t)
     char linha[256];
     while (fgets(linha, sizeof(linha), f) != NULL) {
         Empresa e;
-        int lidos = sscanf(linha, "%31s %d %lf %lf",
+        char extra;
+        int lidos = sscanf(linha, "%31s %d %lf %lf %c",
                            e.nome, &e.acoes_por_colocar,
-                           &e.valor_nominal, &e.cotacao);
+                           &e.valor_nominal, &e.cotacao, &extra);
         if (lidos == 4) {
             if (tabela_adicionar(t, e) != 0) {
                 printf("Erro: sem memória\n");
@@ -71,4 +72,32 @@ void empresas_imprimir(const TabelaEmpresas *t)
                t->dados[i].nome, t->dados[i].acoes_por_colocar,
                t->dados[i].valor_nominal, t->dados[i].cotacao);
     }
+}
+int empresas_guardar(const char *ficheiro, const TabelaEmpresas *t)
+{
+    char temporario[256];
+    snprintf(temporario, sizeof(temporario), "%s.tmp", ficheiro);
+
+    FILE *f = fopen(temporario, "w");
+    if (f == NULL) {
+        printf("Erro: não consegui criar %s\n", temporario);
+        return -1;
+    }
+
+    for (int i = 0; i < t->n; i++) {
+        fprintf(f, "%s %d %.2f %.2f\n",
+                t->dados[i].nome, t->dados[i].acoes_por_colocar,
+                t->dados[i].valor_nominal, t->dados[i].cotacao);
+    }
+
+    if (fclose(f) != 0) {
+        printf("Erro ao escrever %s\n", temporario);
+        return -1;
+    }
+
+    if (rename(temporario, ficheiro) != 0) {
+        printf("Erro: não consegui substituir %s\n", ficheiro);
+        return -1;
+    }
+    return 0;
 }

@@ -17,6 +17,9 @@ int main(void)
     printf("%d empresas carregadas (capacidade %d):\n",
            empresas.n, empresas.capacidade);
     empresas_imprimir(&empresas);
+    if (empresas_guardar("bvdata.txt", &empresas) == 0) {
+        printf("bvdata.txt guardado.\n");
+    }
 
     tabela_libertar(&empresas);
     return 0;

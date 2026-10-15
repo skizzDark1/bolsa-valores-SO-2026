@@ -24,5 +24,6 @@ void tabela_libertar(TabelaEmpresas *t);
 
 int  empresas_carregar(const char *ficheiro, TabelaEmpresas *t);
 void empresas_imprimir(const TabelaEmpresas *t);
+int  empresas_guardar(const char *ficheiro, const TabelaEmpresas *t);
 
 #endif
