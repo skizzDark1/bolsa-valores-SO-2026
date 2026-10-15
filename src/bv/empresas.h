@@ -22,7 +22,7 @@ void tabela_iniciar(TabelaEmpresas *t);
 int  tabela_adicionar(TabelaEmpresas *t, Empresa e);
 void tabela_libertar(TabelaEmpresas *t);
 
-int  empresas_carregar(const char *ficheiro, TabelaEmpresas *t);
+int  empresas_carregar(const char *ficheiro, TabelaEmpresas *t, const char *ficheiro_log);
 void empresas_imprimir(const TabelaEmpresas *t);
 int  empresas_guardar(const char *ficheiro, const TabelaEmpresas *t);
 

@@ -4,8 +4,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> // Se ainda não tiver este include no topo do ficheiro
+#include <string.h>
 #include "empresas.h"
+#include "../common/logs.h"
 
 
 void tabela_iniciar(TabelaEmpresas *t)
@@ -37,31 +38,50 @@ void tabela_libertar(TabelaEmpresas *t)
     tabela_iniciar(t);
 }
 
-int empresas_carregar(const char *ficheiro, TabelaEmpresas *t)
+// Verifica se os valores de uma empresa lida do ficheiro são coerentes.
+// Devolve NULL se estiver tudo bem, ou o motivo pelo qual deve ser ignorada.
+static const char *empresa_motivo_invalida(const Empresa *e, const TabelaEmpresas *t)
+{
+    if (e->acoes_por_colocar < 0) return "ações por colocar negativas";
+    if (e->valor_nominal <= 0)    return "valor nominal tem de ser positivo";
+    if (e->cotacao <= 0)          return "cotação tem de ser positiva";
+    if (empresas_existe(t, e->nome)) return "empresa repetida";
+    return NULL;
+}
+int empresas_carregar(const char *ficheiro, TabelaEmpresas *t, const char *ficheiro_log)
 {
     FILE *f = fopen(ficheiro, "r");
     if (f == NULL) {
-        printf("Erro: não consegui abrir %s\n", ficheiro);
+        log_registar(ficheiro_log, "ERRO: não consegui abrir '%s'", ficheiro);
         return -1;
     }
 
     char linha[256];
+    int num_linha = 0;
     while (fgets(linha, sizeof(linha), f) != NULL) {
+        num_linha++;
         Empresa e;
         char extra;
         int lidos = sscanf(linha, "%31s %d %lf %lf %c",
                            e.nome, &e.acoes_por_colocar,
                            &e.valor_nominal, &e.cotacao, &extra);
+        const char *motivo = empresa_motivo_invalida(&e, t);
+        if (motivo != NULL) {
+            log_registar(ficheiro_log, "Linha %d ignorada (%s): '%s'", num_linha, motivo, e.nome);
+            continue;
+        }
         if (lidos == 4) {
             if (tabela_adicionar(t, e) != 0) {
-                printf("Erro: sem memória\n");
+                log_registar(ficheiro_log, "ERRO: sem memória ao carregar empresas");
                 fclose(f);
                 return -1;
             }
         } else {
-            printf("Linha ignorada: %s", linha);
+            linha[strcspn(linha, "\n")] = '\0';
+            log_registar(ficheiro_log, "Linha %d ignorada (formato inválido): '%s'", num_linha, linha);
         }
     }
+
 
     fclose(f);
     return t->n;

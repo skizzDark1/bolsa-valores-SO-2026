@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include "empresas.h"
 #include "../common/logs.h"
-#include "../common/ordem.h" // <--- Adiciona este include
+#include "validacao.h" // <--- Adiciona este include
 #include "config.h"
 
 int main(int argc, char *argv[])
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     TabelaEmpresas empresas;
     tabela_iniciar(&empresas);
 
-    if (empresas_carregar(cfg.ficheiro_dados, &empresas) < 0) {
+    if (empresas_carregar(cfg.ficheiro_dados, &empresas, cfg.ficheiro_log) < 0) {
         log_registar(cfg.ficheiro_log, "ERRO: Falha ao carregar '%s'", cfg.ficheiro_dados);
         tabela_libertar(&empresas);
         return 1;
