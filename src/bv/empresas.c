@@ -52,7 +52,7 @@ int empresas_carregar(const char *ficheiro, TabelaEmpresas *t, const char *fiche
 {
     FILE *f = fopen(ficheiro, "r");
     if (f == NULL) {
-        log_registar(ficheiro_log, "ERRO: não consegui abrir '%s'", ficheiro);
+        log_registar(ficheiro_log, NIVEL_ERROR,"Não consegui abrir '%s'", ficheiro);
         return -1;
     }
 
@@ -67,18 +67,18 @@ int empresas_carregar(const char *ficheiro, TabelaEmpresas *t, const char *fiche
                            &e.valor_nominal, &e.cotacao, &extra);
         const char *motivo = empresa_motivo_invalida(&e, t);
         if (motivo != NULL) {
-            log_registar(ficheiro_log, "Linha %d ignorada (%s): '%s'", num_linha, motivo, e.nome);
+            log_registar(ficheiro_log, NIVEL_WARNING,"Linha %d ignorada (%s): '%s'", num_linha, motivo, e.nome);
             continue;
         }
         if (lidos == 4) {
             if (tabela_adicionar(t, e) != 0) {
-                log_registar(ficheiro_log, "ERRO: sem memória ao carregar empresas");
+                log_registar(ficheiro_log, NIVEL_ERROR,"Sem memória ao carregar empresas");
                 fclose(f);
                 return -1;
             }
         } else {
             linha[strcspn(linha, "\n")] = '\0';
-            log_registar(ficheiro_log, "Linha %d ignorada (formato inválido): '%s'", num_linha, linha);
+            log_registar(ficheiro_log,NIVEL_WARNING, "Linha %d ignorada (formato inválido): '%s'", num_linha, linha);
         }
     }
 

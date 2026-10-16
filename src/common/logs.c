@@ -1,13 +1,18 @@
-//
-// Created by JP on 12/10/2026.
-//
-
 #include <stdio.h>
 #include <time.h>
 #include <stdarg.h>
 #include "logs.h"
 
-int log_registar(const char *ficheiro_log, const char *formato, ...)
+static const char *nivel_texto(NivelLog nivel)
+{
+    switch (nivel) {
+    case NIVEL_WARNING: return "WARNING";
+    case NIVEL_ERROR:   return "ERROR";
+    default:            return "LOG";
+    }
+}
+
+int log_registar(const char *ficheiro_log, NivelLog nivel, const char *formato, ...)
 {
     // 1. Abre o ficheiro em modo "a" (append = acrescenta ao final)
     FILE *f = fopen(ficheiro_log, "a");
@@ -16,31 +21,28 @@ int log_registar(const char *ficheiro_log, const char *formato, ...)
         return -1;
     }
 
-    // 2. Calcula a data e hora atual (Timestamp)
+    // 2. Data e hora atual: [AAAA-MM-DD HH:MM:SS]
     time_t agora = time(NULL);
-    struct tm *info = localtime(&agora);
     char timestamp[32];
-    // Formato: [AAAA-MM-DD HH:MM:SS]
-    strftime(timestamp, sizeof(timestamp), "[%Y-%m-%d %H:%M:%S]", info);
+    strftime(timestamp, sizeof(timestamp), "[%Y-%m-%d %H:%M:%S]", localtime(&agora));
 
-    // 3. Escreve o timestamp no ficheiro (e mostra também no terminal)
-    fprintf(f, "%s ", timestamp);
-    printf("%s [LOG] ", timestamp); // Mostra também na consola
+    // 3. Prefixo igual no ficheiro e no terminal: [data] [CATEGORIA]
+    const char *categoria = nivel_texto(nivel);
+    fprintf(f, "%s [%s] ", timestamp, categoria);
+    printf("%s [%s] ", timestamp, categoria);
 
-    // 4. Processa os argumentos variáveis (como o printf faz)
+    // 4. Mensagem com argumentos variáveis (como o printf)
     va_list args1, args2;
     va_start(args1, formato);
     va_copy(args2, args1);
-
-    vfprintf(f, formato, args1);       // Escreve no ficheiro
-    vfprintf(stdout, formato, args2);  // Mostra na consola
-    fprintf(f, "\n");
-    printf("\n");
-
+    vfprintf(f, formato, args1);
+    vprintf(formato, args2);
     va_end(args1);
     va_end(args2);
 
-    // 5. Fecha e garante que ficou gravado no disco
+    fprintf(f, "\n");
+    printf("\n");
+
     fclose(f);
     return 0;
 }

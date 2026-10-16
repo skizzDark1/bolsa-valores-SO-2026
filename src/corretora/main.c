@@ -20,14 +20,14 @@ int main(int argc, char *argv[])
     }
 
     // 2. Registo de logs e inicialização dos parâmetros
-    log_registar(cfg.ficheiro_log, "=== Corretora '%s' a iniciar ===", cfg.nome);
-    log_registar(cfg.ficheiro_log, "Configuração: Bolsa Alvo = %s:%d", cfg.ip_bolsa, cfg.porta_bolsa);
+    log_registar(cfg.ficheiro_log,NIVEL_LOG, "=== Corretora '%s' a iniciar ===", cfg.nome);
+    log_registar(cfg.ficheiro_log, NIVEL_LOG,"Configuração: Bolsa Alvo = %s:%d", cfg.ip_bolsa, cfg.porta_bolsa);
 
     printf("\n--- Corretora Inicializada com Sucesso ---\n");
     printf("Nome:  %s\n", cfg.nome);
     printf("Bolsa: %s na porta %d\n\n", cfg.ip_bolsa, cfg.porta_bolsa);
 
-    log_registar(cfg.ficheiro_log, "=== Corretora terminada ===");
+    log_registar(cfg.ficheiro_log, NIVEL_LOG,"=== Corretora terminada ===");
 
     return 0;
 }
